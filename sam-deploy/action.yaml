@@ -14,6 +14,11 @@ inputs:
     description: AWS Secret Access Key
     required: true
 
+  force:
+    description: Deploy even though the cache was hit
+    required: false
+    default: 'false'
+
   bucket:
     description: S3 bucket name
     required: true
@@ -39,12 +44,21 @@ runs:
       with:
         name: ${{ inputs.template }}
 
+    - name: Deduplicate deploy
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: template.yaml # does not really matter
+        key: ${{ inputs.aws-access-key-id }}-${{ inputs.stack-name }}-${{ hashFiles('template.yaml') }}
+
     - name: Setup SAM
+      if: steps.cache.outputs.cache-hit != 'true' || inputs.force == 'true'
       uses: aws-actions/setup-sam@v1
       with:
         version: 1.33.0
 
     - name: Configure AWS credentials
+      if: steps.cache.outputs.cache-hit != 'true' || inputs.force == 'true'
       uses: aws-actions/configure-aws-credentials@v1
       with:
         aws-access-key-id: ${{ inputs.aws-access-key-id }}
@@ -52,6 +66,7 @@ runs:
         aws-secret-access-key: ${{ inputs.aws-secret-access-key }}
 
     - name: Deploy
+      if: steps.cache.outputs.cache-hit != 'true' || inputs.force == 'true'
       run: >-
         sam deploy
         --capabilities CAPABILITY_IAM
