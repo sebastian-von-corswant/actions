@@ -38,6 +38,9 @@ outputs:
 runs:
   using: composite
   steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
     - name: Set up Python 3.9
       uses: actions/setup-python@v2
       with:
@@ -48,9 +51,6 @@ runs:
       uses: aws-actions/setup-sam@v1
       with:
         version: 1.33.0
-
-    - name: Checkout
-      uses: actions/checkout@v2
 
     - name: Install dependencies
       working-directory: ${{ inputs.stack-name }}
