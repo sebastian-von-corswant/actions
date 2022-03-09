@@ -67,14 +67,14 @@ runs:
 
     - name: Deploy
       if: steps.cache.outputs.cache-hit != 'true' || inputs.force == 'true'
-      run: >-
-        sam deploy
-          --capabilities CAPABILITY_IAM CAPABILITY_AUTO_EXPAND
-          --no-fail-on-empty-changeset
-          --no-confirm-changeset
-          --region ${{ inputs.aws-region }}
-          --s3-bucket ${{ inputs.bucket }}
-          --s3-prefix ${{ inputs.stack-name }}
-          --stack-name ${{ inputs.stack-name }}
+      run: |
+        sam deploy \
+          --capabilities CAPABILITY_IAM CAPABILITY_AUTO_EXPAND \
+          --no-fail-on-empty-changeset \
+          --no-confirm-changeset \
+          --region ${{ inputs.aws-region }} \
+          --s3-bucket ${{ inputs.bucket }} \
+          --s3-prefix ${{ inputs.stack-name }} \
+          --stack-name ${{ inputs.stack-name }} \
           --template-file template.yaml
       shell: bash

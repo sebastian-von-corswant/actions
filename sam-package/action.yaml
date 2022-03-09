@@ -96,11 +96,11 @@ runs:
 
     - name: Package
       working-directory: ${{ inputs.stack-name }}
-      run: >-
-        sam package
-          --region ${{ inputs.aws-region }}
-          --s3-bucket ${{ inputs.bucket }}
-          --s3-prefix ${{ inputs.stack-name }}
+      run: |
+        sam package \
+          --region ${{ inputs.aws-region }} \
+          --s3-bucket ${{ inputs.bucket }} \
+          --s3-prefix ${{ inputs.stack-name }} \
           --output-template-file .packaged/template.yaml
       shell: bash
 
