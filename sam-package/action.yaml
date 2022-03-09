@@ -62,7 +62,7 @@ runs:
     - name: Setup SAM
       uses: aws-actions/setup-sam@v1
       with:
-        version: 1.33.0
+        version: 1.40.1
 
     - name: Install dependencies
       if: inputs.requirements
@@ -79,9 +79,7 @@ runs:
     - name: Build
       working-directory: ${{ inputs.stack-name }}
       run: >-
-        sam build
-          --cached
-          --parallel
+        sam build --cached --parallel
       shell: bash
 
     - name: Configure AWS credentials

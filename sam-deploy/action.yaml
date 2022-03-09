@@ -55,7 +55,7 @@ runs:
       if: steps.cache.outputs.cache-hit != 'true' || inputs.force == 'true'
       uses: aws-actions/setup-sam@v1
       with:
-        version: 1.33.0
+        version: 1.40.1
 
     - name: Configure AWS credentials
       if: steps.cache.outputs.cache-hit != 'true' || inputs.force == 'true'
