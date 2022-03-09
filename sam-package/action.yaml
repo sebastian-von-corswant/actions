@@ -18,6 +18,16 @@ inputs:
     description: S3 bucket name
     required: true
 
+  ref:
+    description: Git Ref to package
+    required: false
+    default: ''
+
+  requirements:
+    description: Python Requirements
+    required: false
+    default: requirements.txt
+
   stack-name:
     description: Name of the stack folder
     required: true
@@ -40,6 +50,8 @@ runs:
   steps:
     - name: Checkout
       uses: actions/checkout@v2
+      with:
+        ref: ${{ inputs.ref }}
 
     - name: Set up Python 3.9
       uses: actions/setup-python@v2
@@ -53,21 +65,23 @@ runs:
         version: 1.33.0
 
     - name: Install dependencies
+      if: inputs.requirements
       working-directory: ${{ inputs.stack-name }}
-      run: pip install -r requirements.txt
+      run: pip install -r ${{ inputs.requirements }}
       shell: bash
 
     - name: Cache build
       uses: actions/cache@v2
       with:
         path: ${{ inputs.stack-name }}/.aws-sam
-        key: ${{ runner.os }}-stack-a-sam
+        key: ${{ runner.os }}-${{ inputs.stack-name }}-sam-package
 
     - name: Build
       working-directory: ${{ inputs.stack-name }}
       run: >-
         sam build
-        --parallel
+          --cached
+          --parallel
       shell: bash
 
     - name: Configure AWS credentials
@@ -86,10 +100,10 @@ runs:
       working-directory: ${{ inputs.stack-name }}
       run: >-
         sam package
-        --region ${{ inputs.aws-region }}
-        --s3-bucket ${{ inputs.bucket }}
-        --s3-prefix ${{ inputs.stack-name }}
-        --output-template-file .packaged/template.yaml
+          --region ${{ inputs.aws-region }}
+          --s3-bucket ${{ inputs.bucket }}
+          --s3-prefix ${{ inputs.stack-name }}
+          --output-template-file .packaged/template.yaml
       shell: bash
 
     - name: Upload build
