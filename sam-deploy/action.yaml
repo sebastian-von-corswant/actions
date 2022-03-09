@@ -36,6 +36,11 @@ inputs:
     description: Name of the stack folder
     required: true
 
+  variables:
+    description: Variable
+    required: false
+    default: ''
+
 outputs:
   template:
     description: Template file name
@@ -78,6 +83,7 @@ runs:
           --no-fail-on-empty-changeset \
           --no-confirm-changeset \
           --region ${{ inputs.aws-region }} \
+          --parameter-overrides "${{ inputs.variables }}" \
           --s3-bucket ${{ inputs.bucket }} \
           --s3-prefix ${{ inputs.stack-prefix }}${{ inputs.stack-name }} \
           --stack-name ${{ inputs.stack-prefix }}${{ inputs.stack-name }} \
