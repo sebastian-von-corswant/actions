@@ -27,6 +27,11 @@ inputs:
     description: Name of the stack folder
     required: true
 
+  stack-prefix:
+    description: Stack name prefix
+    required: false
+    default: ''
+
   template:
     description: Name of the stack folder
     required: true
@@ -74,7 +79,7 @@ runs:
           --no-confirm-changeset \
           --region ${{ inputs.aws-region }} \
           --s3-bucket ${{ inputs.bucket }} \
-          --s3-prefix ${{ inputs.stack-name }} \
-          --stack-name ${{ inputs.stack-name }} \
+          --s3-prefix ${{ inputs.stack-prefix }}${{ inputs.stack-name }} \
+          --stack-name ${{ inputs.stack-prefix }}${{ inputs.stack-name }} \
           --template-file template.yaml
       shell: bash

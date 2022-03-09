@@ -32,6 +32,11 @@ inputs:
     description: Name of the stack folder
     required: true
 
+  stack-prefix:
+    description: Stack name prefix
+    required: false
+    default: ''
+
 outputs:
   bucket:
     description: Target bucket name
@@ -100,7 +105,7 @@ runs:
         sam package \
           --region ${{ inputs.aws-region }} \
           --s3-bucket ${{ inputs.bucket }} \
-          --s3-prefix ${{ inputs.stack-name }} \
+          --s3-prefix ${{ inputs.stack-prefix }}${{ inputs.stack-name }} \
           --output-template-file .packaged/template.yaml
       shell: bash
 
