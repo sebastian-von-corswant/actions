@@ -37,6 +37,11 @@ inputs:
     required: false
     default: ''
 
+  use-container:
+    description: Build inside a docker container
+    required: false
+    default: 'false'
+
 outputs:
   bucket:
     description: Target bucket name
@@ -81,7 +86,16 @@ runs:
         path: ${{ inputs.stack-name }}/.aws-sam
         key: ${{ runner.os }}-${{ inputs.stack-name }}-sam-package
 
+    - name: Build using Container
+      id: build-using-container
+      if: ${{ fromJSON(inputs.use-container) }}
+      working-directory: ${{ inputs.stack-name }}
+      run: >-
+        sam build --cached --parallel --use-conatiner
+      shell: bash
+
     - name: Build
+      if: ${{ steps.build-using-container.outcome == 'skipped' }}
       working-directory: ${{ inputs.stack-name }}
       run: >-
         sam build --cached --parallel
