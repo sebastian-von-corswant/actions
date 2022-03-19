@@ -91,7 +91,7 @@ runs:
       if: ${{ fromJSON(inputs.use-container) }}
       working-directory: ${{ inputs.stack-name }}
       run: >-
-        sam build --cached --parallel --use-conatiner
+        sam build --cached --parallel --use-container
       shell: bash
 
     - name: Build
