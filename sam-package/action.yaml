@@ -28,6 +28,11 @@ inputs:
     required: false
     default: requirements.txt
 
+  sam-version:
+    description: Version of AWS SAM
+    required: false
+    default: 1.50.0
+
   stack-name:
     description: Name of the stack folder
     required: true
@@ -79,7 +84,7 @@ runs:
       if: ${{ !fromJSON(inputs.use-integrated-sam) }}
       uses: aws-actions/setup-sam@v1
       with:
-        version: 1.40.1
+        version: ${{ inputs.sam-version }}
 
     - name: Install dependencies
       if: ${{ !fromJSON(inputs.use-integrated-sam) && inputs.requirements }}
@@ -91,7 +96,7 @@ runs:
       if: ${{ fromJSON(inputs.use-integrated-sam) }}
       working-directory: ${{ inputs.stack-name }}
       run: >-
-        pip install -r ${{ inputs.requirements }} setuptools wheel aws-sam-cli==1.40.1
+        pip install -r ${{ inputs.requirements }} setuptools wheel aws-sam-cli==${{ inputs.sam-version }}
       shell: bash
 
     - name: Cache build
