@@ -23,6 +23,11 @@ inputs:
     description: S3 bucket name
     required: true
 
+  sam-version:
+    default: 1.67.0
+    description: Version of AWS SAM to use
+    required: false
+
   stack-name:
     description: Name of the stack folder
     required: true
@@ -50,22 +55,22 @@ runs:
   using: composite
   steps:
     - name: Download build
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v3
       with:
         name: ${{ inputs.template }}
 
     - name: Deduplicate deploy
       id: cache
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: template.yaml # does not really matter
         key: ${{ inputs.aws-access-key-id }}-${{ inputs.stack-name }}-${{ hashFiles('template.yaml') }}
 
     - name: Setup SAM
       if: steps.cache.outputs.cache-hit != 'true' || inputs.force == 'true'
-      uses: aws-actions/setup-sam@v1
+      uses: aws-actions/setup-sam@v2
       with:
-        version: 1.40.1
+        version: ${{ inputs.sam-version }}
 
     - name: Configure AWS credentials
       if: steps.cache.outputs.cache-hit != 'true' || inputs.force == 'true'
