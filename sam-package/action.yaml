@@ -2,16 +2,12 @@ name: SAM Package
 description: Build and package using SAM
 
 inputs:
-  aws-access-key-id:
-    description: AWS Access Key ID
-    required: true
-
   aws-region:
     description: AWS Region
     required: true
 
-  aws-secret-access-key:
-    description: AWS Secret Access Key
+  aws-role-arn:
+    description: AWS Role to assume when packaing
     required: true
 
   bucket:
@@ -77,14 +73,18 @@ runs:
     - name: Set up Python 3.9
       uses: actions/setup-python@v4
       with:
-        python-version: 3.9
         cache: pip
+        python-version: 3.9
 
     - name: Setup SAM
       if: ${{ !fromJSON(inputs.use-integrated-sam) }}
       uses: aws-actions/setup-sam@v2
       with:
         version: ${{ inputs.sam-version }}
+
+    - name: SAM fix https://github.com/aws/aws-sam-cli/issues/4527
+      run: $(dirname $(readlink $(which sam)))/pip install --force-reinstall "cryptography==38.0.4"
+      shell: bash
 
     - name: Install dependencies
       if: ${{ !fromJSON(inputs.use-integrated-sam) && inputs.requirements }}
@@ -123,9 +123,10 @@ runs:
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
-        aws-access-key-id: ${{ inputs.aws-access-key-id }}
-        aws-secret-access-key: ${{ inputs.aws-secret-access-key }}
         aws-region: ${{ inputs.aws-region }}
+        role-duration-seconds: 900
+        role-session-name: deploy-${{ inputs.stack-prefix }}${{ inputs.stack-name }}
+        role-to-assume: ${{ inputs.aws-role-arn }}
 
     - name: Prepare Output Directory
       working-directory: ${{ inputs.stack-name }}

@@ -2,16 +2,12 @@ name: SAM Package
 description: Build and package using SAM
 
 inputs:
-  aws-access-key-id:
-    description: AWS Access Key ID
-    required: true
-
   aws-region:
     description: AWS Region
     required: true
 
-  aws-secret-access-key:
-    description: AWS Secret Access Key
+  aws-role-arn:
+    description: AWS Role to assume when deploying
     required: true
 
   force:
@@ -41,6 +37,11 @@ inputs:
     description: Name of the stack folder
     required: true
 
+  timeout:
+    description: Approximate duration of longest posible build in seconds
+    required: false
+    default: '3600'
+
   variables:
     description: Variable
     required: false
@@ -66,19 +67,29 @@ runs:
         path: template.yaml # does not really matter
         key: ${{ inputs.aws-access-key-id }}-${{ inputs.stack-name }}-${{ hashFiles('template.yaml') }}
 
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.9
+
     - name: Setup SAM
       if: steps.cache.outputs.cache-hit != 'true' || inputs.force == 'true'
       uses: aws-actions/setup-sam@v2
       with:
         version: ${{ inputs.sam-version }}
 
+    - name: SAM fix https://github.com/aws/aws-sam-cli/issues/4527
+      run: $(dirname $(readlink $(which sam)))/pip install --force-reinstall "cryptography==38.0.4"
+      shell: bash
+
     - name: Configure AWS credentials
       if: steps.cache.outputs.cache-hit != 'true' || inputs.force == 'true'
       uses: aws-actions/configure-aws-credentials@v1
       with:
-        aws-access-key-id: ${{ inputs.aws-access-key-id }}
         aws-region: ${{ inputs.aws-region }}
-        aws-secret-access-key: ${{ inputs.aws-secret-access-key }}
+        role-duration-seconds: ${{ inputs.timeout }}
+        role-session-name: deploy-${{ inputs.stack-prefix }}${{ inputs.stack-name }}
+        role-to-assume: ${{ inputs.aws-role-arn }}
 
     - name: Deploy
       if: steps.cache.outputs.cache-hit != 'true' || inputs.force == 'true'
