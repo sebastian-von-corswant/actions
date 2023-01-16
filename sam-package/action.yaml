@@ -29,6 +29,10 @@ inputs:
     description: Version of AWS SAM to use
     required: false
 
+  ssh-private-key:
+    description: SSH key to use when installing dependencies
+    required: false
+
   stack-name:
     description: Name of the stack folder
     required: true
@@ -86,6 +90,12 @@ runs:
       run: $(dirname $(readlink $(which sam)))/pip install --force-reinstall "cryptography==38.0.4"
       shell: bash
 
+    - name: Install SSH Key
+      if: ${{ inputs.ssh-private-key }}
+      uses: webfactory/ssh-agent@v0.7.0
+      with:
+        ssh-private-key: ${{ inputs.ssh-private-key }}
+
     - name: Install dependencies
       if: ${{ !fromJSON(inputs.use-integrated-sam) && inputs.requirements }}
       working-directory: ${{ inputs.stack-name }}
@@ -110,14 +120,14 @@ runs:
       if: ${{ fromJSON(inputs.use-container) }}
       working-directory: ${{ inputs.stack-name }}
       run: >-
-        sam build --cached --parallel --use-container
+        sam build --cached --manifest ${{ inputs.requirements }} --parallel --use-container
       shell: bash
 
     - name: Build
       if: ${{ steps.build-using-container.outcome == 'skipped' }}
       working-directory: ${{ inputs.stack-name }}
       run: >-
-        sam build --cached --parallel
+        sam build --cached --manifest ${{ inputs.requirements }} --parallel
       shell: bash
 
     - name: Configure AWS credentials
