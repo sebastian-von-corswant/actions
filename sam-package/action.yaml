@@ -124,14 +124,14 @@ runs:
       if: ${{ fromJSON(inputs.use-container) }}
       working-directory: ${{ inputs.stack-name }}
       run: >-
-        sam build --cached --manifest ${{ inputs.requirements }} --parallel --use-container ${{ inputs.sam-build-args }}
+        sam build --cached --parallel --use-container ${{ inputs.sam-build-args }}
       shell: bash
 
     - name: Build
       if: ${{ steps.build-using-container.outcome == 'skipped' }}
       working-directory: ${{ inputs.stack-name }}
       run: >-
-        sam build --cached --manifest ${{ inputs.requirements }} --parallel ${{ inputs.sam-build-args }}
+        sam build --cached --parallel ${{ inputs.sam-build-args }}
       shell: bash
 
     - name: Configure AWS credentials
