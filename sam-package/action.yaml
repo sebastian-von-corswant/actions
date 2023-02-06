@@ -91,6 +91,7 @@ runs:
         version: ${{ inputs.sam-version }}
 
     - name: SAM fix https://github.com/aws/aws-sam-cli/issues/4527
+      if: ${{ !fromJSON(inputs.use-integrated-sam) }}
       run: $(dirname $(readlink $(which sam)))/pip install --force-reinstall "cryptography==38.0.4"
       shell: bash
 
