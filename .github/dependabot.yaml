@@ -3,6 +3,11 @@
 version: 2
 updates:
   - package-ecosystem: github-actions
-    directory: /
+    directory: /sam-deploy
+    schedule:
+      interval: weekly
+      
+  - package-ecosystem: github-actions
+    directory: /sam-package
     schedule:
       interval: weekly
