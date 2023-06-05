@@ -85,7 +85,7 @@ runs:
 
     - name: Configure AWS credentials
       if: steps.cache.outputs.cache-hit != 'true' || inputs.force == 'true'
-      uses: aws-actions/configure-aws-credentials@v1-node16
+      uses: aws-actions/configure-aws-credentials@v2.1.0
       with:
         aws-region: ${{ inputs.aws-region }}
         role-duration-seconds: ${{ inputs.timeout }}
