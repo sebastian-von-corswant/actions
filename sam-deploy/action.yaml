@@ -20,7 +20,7 @@ inputs:
     required: true
 
   sam-version:
-    default: 1.67.0
+    default: 1.86.1
     description: Version of AWS SAM to use
     required: false
 
@@ -78,14 +78,9 @@ runs:
       with:
         version: ${{ inputs.sam-version }}
 
-    - name: SAM fix https://github.com/aws/aws-sam-cli/issues/4527
-      if: steps.cache.outputs.cache-hit != 'true' || inputs.force == 'true'
-      run: $(dirname $(readlink $(which sam)))/pip install --force-reinstall "cryptography==38.0.4"
-      shell: bash
-
     - name: Configure AWS credentials
       if: steps.cache.outputs.cache-hit != 'true' || inputs.force == 'true'
-      uses: aws-actions/configure-aws-credentials@v1-node16
+      uses: aws-actions/configure-aws-credentials@v2
       with:
         aws-region: ${{ inputs.aws-region }}
         role-duration-seconds: ${{ inputs.timeout }}
