@@ -123,6 +123,10 @@ runs:
         path: ${{ inputs.stack-name }}/.aws-sam
         key: ${{ runner.os }}-${{ inputs.stack-name }}-sam-package
 
+    - if: ${{ inputs.ecr-name != '' }}
+      name: 🪛 Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+
     - name: Build using Container
       id: build-using-container
       if: ${{ fromJSON(inputs.use-container) }}
@@ -146,10 +150,6 @@ runs:
         role-duration-seconds: 900
         role-session-name: deploy-${{ inputs.stack-prefix }}${{ inputs.stack-name }}
         role-to-assume: ${{ inputs.aws-role-arn }}
-
-    - if: ${{ inputs.ecr-name != '' }}
-      name: 🪛 Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2
 
     - if: ${{ inputs.ecr-name != '' }}
       name: 🐳 Login to AWS ECR
@@ -178,7 +178,7 @@ runs:
       working-directory: ${{ inputs.stack-name }}
       run: |
         sam package ${{ inputs.sam-package-args }} \
-          --image-repository ${{ steps.aws.outputs.aws-account-id }}.dkr.ecr.${{ inputs.aws-region }}.amazonaws.com/${{ inputs.ecr-name }}
+          --image-repository ${{ steps.aws.outputs.aws-account-id }}.dkr.ecr.${{ inputs.aws-region }}.amazonaws.com/${{ inputs.ecr-name }} \
           --region ${{ inputs.aws-region }} \
           --s3-bucket ${{ inputs.bucket }} \
           --s3-prefix ${{ inputs.stack-prefix }}${{ inputs.stack-name }} \
