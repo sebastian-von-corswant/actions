@@ -14,6 +14,11 @@ inputs:
     description: S3 bucket name
     required: true
 
+  ecr-name:
+    description: Name of AWS ECR to use when packaging
+    required: false
+    default: ''
+
   ref:
     description: Git Ref to package
     required: false
@@ -26,6 +31,10 @@ inputs:
 
   sam-build-args:
     description: Additional args to pass to SAM when building
+    required: false
+
+  sam-package-args:
+    description: Additional args to pass to SAM when packaging
     required: false
 
   sam-version:
@@ -129,23 +138,43 @@ runs:
         sam build --cached --parallel ${{ inputs.sam-build-args }}
       shell: bash
 
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v2
+    - id: aws
+      name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
       with:
         aws-region: ${{ inputs.aws-region }}
         role-duration-seconds: 900
         role-session-name: deploy-${{ inputs.stack-prefix }}${{ inputs.stack-name }}
         role-to-assume: ${{ inputs.aws-role-arn }}
 
+    - if: ${{ inputs.ecr-name != '' }}
+      name: 🐳 Login to AWS ECR
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ steps.aws.outputs.aws-account-id }}.dkr.ecr.${{ inputs.aws-region }}.amazonaws.com
+
     - name: Prepare Output Directory
       working-directory: ${{ inputs.stack-name }}
       run: mkdir .packaged
       shell: bash
 
-    - name: Package
+    - if: ${{ inputs.ecr-name == '' }}
+      name: Package
       working-directory: ${{ inputs.stack-name }}
       run: |
-        sam package \
+        sam package ${{ inputs.sam-package-args }} \
+          --region ${{ inputs.aws-region }} \
+          --s3-bucket ${{ inputs.bucket }} \
+          --s3-prefix ${{ inputs.stack-prefix }}${{ inputs.stack-name }} \
+          --output-template-file .packaged/template.yaml
+      shell: bash
+
+    - if: ${{ inputs.ecr-name != '' }}
+      name: Package with ECR
+      working-directory: ${{ inputs.stack-name }}
+      run: |
+        sam package ${{ inputs.sam-package-args }} \
+          --image-repository ${{ steps.aws.outputs.aws-account-id }}.dkr.ecr.${{ inputs.region }}.amazonaws.com/${{ inputs.ecr-name }}
           --region ${{ inputs.aws-region }} \
           --s3-bucket ${{ inputs.bucket }} \
           --s3-prefix ${{ inputs.stack-prefix }}${{ inputs.stack-name }} \
