@@ -114,7 +114,7 @@ runs:
           --output json \
           --region "${{ inputs.aws-region }}" \
           --stack-name "${{ inputs.stack-prefix }}${{ inputs.stack-name }}" \
-          | jq -s -c \
+          | jq -c \
         )
 
         ret=$?
