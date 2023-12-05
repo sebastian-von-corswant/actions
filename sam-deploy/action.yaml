@@ -108,12 +108,19 @@ runs:
 
     - name: List Stack Outputs
       id: list-stack-outputs
+
       run: |
         stack_outputs=$(sam list stack-outputs \
           --output json \
-          --region ${{ inputs.aws-region }} \
-          --stack-name ${{ inputs.stack-prefix }}${{ inputs.stack-name }} \
+          --region "${{ inputs.aws-region }}" \
+          --stack-name "${{ inputs.stack-prefix }}${{ inputs.stack-name }}" \
           | jq -s -c \
         )
-        echo 'stack-outputs=$stack_outputs' >> "$GITHUB_OUTPUT"
+
+        ret=$?
+        if [ $ret -ne 0 ]; then
+          echo "stack-outputs='[]'" >> "$GITHUB_OUTPUT"
+        else
+          echo "stack-outputs='${stack_outputs}'" >> "$GITHUB_OUTPUT"
+        fi
       shell: bash
