@@ -108,7 +108,12 @@ runs:
 
     - name: List Stack Outputs
       id: list-stack-outputs
-      run:
-        stack_outputs=$(sam list stack-outputs --output json --region ${{ inputs.aws-region }} --stack-name ${{ inputs.stack-prefix }}${{ inputs.stack-name }})
-        echo "stack-outputs=$stack_outputs" >> "$GITHUB_OUTPUT"
+      run: |
+        stack_outputs=$(sam list stack-outputs \
+          --output json \
+          --region ${{ inputs.aws-region }} \
+          --stack-name ${{ inputs.stack-prefix }}${{ inputs.stack-name }} \
+          | jq -s -c \
+        )
+        echo 'stack-outputs=$stack_outputs' >> "$GITHUB_OUTPUT"
       shell: bash
