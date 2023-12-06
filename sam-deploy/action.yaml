@@ -121,6 +121,6 @@ runs:
         if [ $ret -ne 0 ]; then
           echo "stack-outputs=[]" >> "$GITHUB_OUTPUT"
         else
-          echo 'stack-outputs=${stack_outputs}' >> "$GITHUB_OUTPUT"
+          echo "stack-outputs=${stack_outputs}" >> "$GITHUB_OUTPUT"
         fi
       shell: bash
