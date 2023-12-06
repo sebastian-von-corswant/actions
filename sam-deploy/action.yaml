@@ -107,8 +107,8 @@ runs:
       shell: bash
 
     - name: List Stack Outputs
+      continue-on-error: true
       id: list-stack-outputs
-
       run: |
         stack_outputs=$(sam list stack-outputs \
           --output json \
@@ -119,8 +119,8 @@ runs:
 
         ret=$?
         if [ $ret -ne 0 ]; then
-          echo "stack-outputs='[]'" >> "$GITHUB_OUTPUT"
+          echo "stack-outputs=[]" >> "$GITHUB_OUTPUT"
         else
-          echo "stack-outputs='${stack_outputs}'" >> "$GITHUB_OUTPUT"
+          echo 'stack-outputs=${stack_outputs}' >> "$GITHUB_OUTPUT"
         fi
       shell: bash
