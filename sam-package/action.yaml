@@ -186,7 +186,7 @@ runs:
       shell: bash
 
     - name: Upload build
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: ${{ inputs.stack-name }}-template
         path: ${{ inputs.stack-name }}/.packaged/template.yaml
