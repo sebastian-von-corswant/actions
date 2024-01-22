@@ -66,7 +66,7 @@ runs:
 
     - name: Deduplicate deploy
       id: cache
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: template.yaml # does not really matter
         key: ${{ inputs.aws-access-key-id }}-${{ inputs.stack-name }}-${{ hashFiles('template.yaml') }}
