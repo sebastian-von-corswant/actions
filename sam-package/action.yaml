@@ -118,7 +118,7 @@ runs:
       shell: bash
 
     - name: Cache build
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: ${{ inputs.stack-name }}/.aws-sam
         key: ${{ runner.os }}-${{ inputs.stack-name }}-sam-package
