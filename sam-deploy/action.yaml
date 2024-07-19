@@ -95,7 +95,7 @@ runs:
       if: steps.cache.outputs.cache-hit != 'true' || inputs.force == 'true'
       run: |
         sam deploy \
-          --capabilities CAPABILITY_IAM CAPABILITY_AUTO_EXPAND \
+          --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM CAPABILITY_AUTO_EXPAND \
           --no-fail-on-empty-changeset \
           --no-confirm-changeset \
           --region ${{ inputs.aws-region }} \
