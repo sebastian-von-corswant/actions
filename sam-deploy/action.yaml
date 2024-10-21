@@ -79,7 +79,8 @@ runs:
     - name: Set up Python ${{ inputs.python-version }}
       uses: actions/setup-python@v5
       with:
-        cache: 'pip'
+        # Since we don't perform a checkout there won't be a requirements file present
+        # cache: 'pip'
         python-version: ${{ inputs.python-version }}
 
     - name: Setup SAM
