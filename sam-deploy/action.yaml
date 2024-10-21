@@ -19,8 +19,13 @@ inputs:
     description: S3 bucket name
     required: true
 
+  python-version:
+    default: '3.9'
+    description: Version of Python to use
+    required: false
+
   sam-version:
-    default: 1.86.1
+    default: 1.126.0
     description: Version of AWS SAM to use
     required: false
 
@@ -60,21 +65,22 @@ runs:
   using: composite
   steps:
     - name: Download build
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: ${{ inputs.template }}
 
     - name: Deduplicate deploy
       id: cache
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: template.yaml # does not really matter
         key: ${{ inputs.aws-access-key-id }}-${{ inputs.stack-name }}-${{ hashFiles('template.yaml') }}
 
-    - name: Set up Python 3.9
-      uses: actions/setup-python@v4
+    - name: Set up Python ${{ inputs.python-version }}
+      uses: actions/setup-python@v5
       with:
-        python-version: 3.9
+        cache: 'pip'
+        python-version: ${{ inputs.python-version }}
 
     - name: Setup SAM
       if: steps.cache.outputs.cache-hit != 'true' || inputs.force == 'true'
